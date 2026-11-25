@@ -1,0 +1,28 @@
+<ion-content class="ion-padding">
+  <div class="ion-text-center ion-margin-top">
+    <h2>Control Electoral ESFOT</h2>
+    <p>Ingreso con Cédula Ecuatoriana</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="ingresar()">
+    <ion-item>
+      <ion-input label="Cédula" labelPlacement="floating" maxlength="10" formControlName="cedula"></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('cedula')?.touched && form.get('cedula')?.hasError('cedulaInvalida')">
+      <small>Cédula ecuatoriana inválida.</small>
+    </ion-text>
+
+    <ion-item>
+      <ion-input label="Contraseña" labelPlacement="floating" type="password" formControlName="password"></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="form.invalid || auth.cargando()">
+      <ion-spinner *ngIf="auth.cargando()" name="crescent"></ion-spinner>
+      <span *ngIf="!auth.cargando()">Iniciar Sesión</span>
+    </ion-button>
+  </form>
+
+  <ion-button expand="block" fill="clear" (click)="abrirRecuperacion()">
+    ¿Olvidaste tu contraseña?
+  </ion-button>
+</ion-content>

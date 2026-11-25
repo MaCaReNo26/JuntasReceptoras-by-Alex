@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Veedor de Mesa</ion-title>
+    <ion-buttons slot="end">
+      <ion-badge [color]="offlineSync.isOnline() ? 'success' : 'warning'">
+        {{ offlineSync.isOnline() ? 'En línea' : 'Offline (' + offlineSync.pendientesCount() + ')' }}
+      </ion-badge>
+      <ion-button (click)="salir()">Salir</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h4>Mis JRV Asignadas</h4>
+  <ion-list>
+    <ion-item *ngFor="let m of misMesas()" button (click)="seleccionarMesa(m.id)" [color]="mesaSeleccionadaId() === m.id ? 'light' : ''">
+      <ion-label>JRV #{{ m.numero_mesa }}</ion-label>
+      <ion-badge>{{ m.estado }}</ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="mesaSeleccionadaId()" class="ion-margin-top">
+    <ion-item>
+      <ion-select label="Dignidad" [value]="dignidadSeleccionada()" (ionChange)="cambiarDignidad($event.detail.value)">
+        <ion-select-option value="alcalde">Alcalde</ion-select-option>
+        <ion-select-option value="prefecto">Prefecto</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <form [formGroup]="actaForm" (ngSubmit)="enviarActa()">
+      <ion-item *ngFor="let c of candidatosActuales(); let i = index">
+        <ion-input [label]="c.nombre_candidato + ' (' + c.lista + ')'" labelPlacement="floating" type="number" [formControlName]="'votos_org' + (i + 1)"></ion-input>
+      </ion-item>
+      <ion-item><ion-input label="Votos Blancos" labelPlacement="floating" type="number" formControlName="votos_blancos"></ion-input></ion-item>
+      <ion-item><ion-input label="Votos Nulos" labelPlacement="floating" type="number" formControlName="votos_nulos"></ion-input></ion-item>
+      <ion-item><ion-input label="Total Sufragantes" labelPlacement="floating" type="number" formControlName="total_sufragantes"></ion-input></ion-item>
+
+      <ion-text color="danger" *ngIf="actaForm.hasError('descuadreVotos')">
+        <p>La suma de votos ({{ actaForm.getError('descuadreVotos')?.suma }}) no coincide con el total de sufragantes ({{ actaForm.getError('descuadreVotos')?.total }}).</p>
+      </ion-text>
+
+      <ion-button expand="block" color="secondary" type="button" class="ion-margin-top" (click)="tomarFotoYUbicacion()">
+        Capturar Foto Nítida y GPS
+      </ion-button>
+
+      <div *ngIf="fotoCapturada()" class="ion-margin-top ion-text-center">
+        <img [src]="fotoCapturada()" style="max-height: 180px; border-radius: 8px;" />
+        <p *ngIf="gpsCapturado()"><small>GPS: {{ gpsCapturado()?.latitud }}, {{ gpsCapturado()?.longitud }}</small></p>
+      </div>
+
+      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="actaForm.invalid || !fotoCapturada() || !gpsCapturado() || electoral.cargando()">
+        <ion-spinner *ngIf="electoral.cargando()" name="crescent"></ion-spinner>
+        <span *ngIf="!electoral.cargando()">Guardar Acta</span>
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

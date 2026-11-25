@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Coordinador Provincial</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="salir()">Salir</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="vista()" (ionChange)="vista.set($any($event.detail.value))">
+      <ion-segment-button value="dashboard"><ion-label>Resultados</ion-label></ion-segment-button>
+      <ion-segment-button value="recintos"><ion-label>Recintos</ion-label></ion-segment-button>
+      <ion-segment-button value="coordinadores"><ion-label>Coordinadores</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="vista() === 'dashboard'">
+    <ion-item>
+      <ion-select label="Dignidad" [value]="filtroDignidad()" (ionChange)="filtroDignidad.set($event.detail.value)">
+        <ion-select-option value="alcalde">Alcaldía</ion-select-option>
+        <ion-select-option value="prefecto">Prefectura</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Recinto" [value]="filtroRecintoId()" (ionChange)="filtroRecintoId.set($event.detail.value)">
+        <ion-select-option [value]="0">Todos (Consolidado Provincial)</ion-select-option>
+        <ion-select-option *ngFor="let r of electoral.recintos()" [value]="r.id">{{ r.nombre }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Avance: {{ resultadosConsolidados().actasProcesadas }} / {{ resultadosConsolidados().totalMesas }} JRV</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let c of resultadosConsolidados().candidatos">
+            <ion-label>
+              <h3>{{ c.nombre_candidato }} ({{ c.lista }})</h3>
+              <p>{{ c.organizacion }}</p>
+            </ion-label>
+            <strong>{{ c.votos }} votos</strong>
+          </ion-item>
+          <ion-item><ion-label>Blancos</ion-label><strong>{{ resultadosConsolidados().blancos }}</strong></ion-item>
+          <ion-item><ion-label>Nulos</ion-label><strong>{{ resultadosConsolidados().nulos }}</strong></ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <h4>Auditoría GPS de Actas</h4>
+    <ion-list>
+      <ion-item *ngFor="let a of electoral.actas()">
+        <ion-label>
+          <h3>JRV #{{ a.jrv_id }} - {{ a.dignidad | uppercase }}</h3>
+          <p>GPS: {{ a.latitud }}, {{ a.longitud }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div *ngIf="vista() === 'recintos'">
+    <form [formGroup]="recintoForm" (ngSubmit)="crearRecinto()">
+      <ion-item><ion-input label="Cantón" labelPlacement="floating" formControlName="canton"></ion-input></ion-item>
+      <ion-item><ion-input label="Parroquia" labelPlacement="floating" formControlName="parroquia"></ion-input></ion-item>
+      <ion-item><ion-input label="Nombre Recinto" labelPlacement="floating" formControlName="nombre"></ion-input></ion-item>
+      <ion-item><ion-input label="Cantidad JRV" labelPlacement="floating" type="number" formControlName="cantidad_jrv"></ion-input></ion-item>
+      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="recintoForm.invalid">Crear Recinto</ion-button>
+    </form>
+
+    <ion-list class="ion-margin-top">
+      <ion-item *ngFor="let r of electoral.recintos()">
+        <ion-label>
+          <h3>{{ r.nombre }}</h3>
+          <p>{{ r.canton }} - {{ r.parroquia }} | {{ r.cantidad_jrv }} mesas</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div *ngIf="vista() === 'coordinadores'">
+    <form [formGroup]="coordForm" (ngSubmit)="crearCoordinador()">
+      <ion-item><ion-input label="Cédula" labelPlacement="floating" maxlength="10" formControlName="cedula"></ion-input></ion-item>
+      <ion-item><ion-input label="Nombres" labelPlacement="floating" formControlName="nombres"></ion-input></ion-item>
+      <ion-item><ion-input label="Apellidos" labelPlacement="floating" formControlName="apellidos"></ion-input></ion-item>
+      <ion-item><ion-input label="Teléfono" labelPlacement="floating" formControlName="telefono"></ion-input></ion-item>
+      <ion-item><ion-input label="Correo" labelPlacement="floating" type="email" formControlName="correo"></ion-input></ion-item>
+      <ion-item>
+        <ion-select label="Asignar Recinto" formControlName="recinto_id">
+          <ion-select-option *ngFor="let r of electoral.recintos()" [value]="r.id">{{ r.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="coordForm.invalid">Crear Coordinador</ion-button>
+    </form>
+  </div>
+</ion-content>

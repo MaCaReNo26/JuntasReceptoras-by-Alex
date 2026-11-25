@@ -1,0 +1,13 @@
+<ion-content class="ion-padding">
+  <h3>Primer Acceso: Cambio Obligatorio</h3>
+  <p>Por seguridad debe cambiar la contraseña temporal Ecuador2026.</p>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <ion-item>
+      <ion-input label="Nueva Contraseña (mínimo 8 caracteres)" labelPlacement="floating" type="password" formControlName="nuevaClave"></ion-input>
+    </ion-item>
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="form.invalid">
+      Actualizar y Continuar
+    </ion-button>
+  </form>
+</ion-content>
