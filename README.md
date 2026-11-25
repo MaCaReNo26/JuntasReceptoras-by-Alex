@@ -378,7 +378,9 @@ En el siguiente video se explica el funcionamiento del sistema, sus principales 
 - Las rutas de cada rol verifican que el usuario tenga un perfil válido y que haya completado el cambio obligatorio de contraseña cuando corresponda.
 - La sincronización offline depende de que el dispositivo vuelva a tener conexión y de que los servicios de Supabase estén disponibles.
 
-La comprobación de nitidez implementada es una evaluación básica de variación entre píxeles; no constituye una validación documental ni garantiza por sí sola la autenticidad o legibilidad completa del acta.
+## APK
+
+Se encuentra en el mismo repositorio el APK descargable para su funcionamiento. 
 
 ## Autoría
 
